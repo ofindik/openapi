@@ -1,0 +1,174 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This document provides the RESTful subscriber interface specification of RBT. Client of the interface will be RBT Back-End. Server of the interface will be DSP.",
+    "version": "v1",
+    "title": "RBT SC2 DSP Subscriber Interface"
+  },
+  "tags": [
+    {
+      "name": "SC2",
+      "description": "Operations for RBT Service Contract 2"
+    }
+  ],
+  "parameters": {
+    "msisdnParam": {
+      "in": "header",
+      "name": "msisdn",
+      "description": "MSISDN of the subscriber",
+      "required": true,
+      "type": "string"
+    },
+    "channelParam": {
+      "in": "header",
+      "name": "Channel",
+      "description": "This parameter is used to track the channel of the request. Possible values are;\n  - IVR\n  - USSD\n  - SMS\n  - RBTMobileApp\n  - RBTSubscriberPortal\n  - MobilyMobileApp\n  - MobilyEPortal\n  - OTHER",
+      "required": false,
+      "type": "string"
+    },
+    "usernameParam": {
+      "in": "header",
+      "name": "Username",
+      "description": "This parameter is used to track the user of the API; log purposes only. Maximum length can be 128 chars.",
+      "required": false,
+      "type": "string"
+    },
+    "transactionIdParam": {
+      "in": "header",
+      "name": "TransactionId",
+      "description": "This parameter is used to track the API method transaction; log purposes only. It is meaningful for POST and PUT methods; in RBT APIs. Maximum length can be 128 chars.",
+      "required": false,
+      "type": "string"
+    },
+    "subscriberParam": {
+      "in": "body",
+      "name": "Subscriber",
+      "description": "Subscriber object",
+      "required": true,
+      "schema": {
+        "$ref": "#/definitions/Subscriber"
+      }
+    }
+  },
+  "paths": {
+    "/rbt/v1/subscribers": {
+      "get": {
+        "tags": [
+          "SC2"
+        ],
+        "summary": "Queries the subscriber",
+        "operationId": "querySubscriber",
+        "description": "This method is used to query a subscriber identified with {msisdn}.",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/msisdnParam"
+          },
+          {
+            "$ref": "#/parameters/channelParam"
+          },
+          {
+            "$ref": "#/parameters/usernameParam"
+          }
+        ],
+        "security": [
+          {
+            "basic_security": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "subscriber is retrieved",
+            "schema": {
+              "$ref": "#/definitions/Subscriber"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "basic_security": {
+      "type": "basic",
+      "description": "Basic Authentication"
+    }
+  },
+  "definitions": {
+    "Subscriber": {
+      "type": "object",
+      "required": [
+        "msisdn",
+        "san",
+        "language",
+        "state",
+        "paymentType",
+        "customerName",
+        "imsi"
+      ],
+      "properties": {
+        "msisdn": {
+          "description": "MSISDN of the subscriber",
+          "example": 966564051757,
+          "type": "string"
+        },
+        "san": {
+          "description": "Subscriber Account Number",
+          "example": 1001236563194353,
+          "type": "string"
+        },
+        "language": {
+          "description": "Possible values are:\n  - EN\n  - AR",
+          "type": "string"
+        },
+        "state": {
+          "description": "Possible values are:\n  - ACTIVE\n  - INACTIVE",
+          "type": "string"
+        },
+        "paymentType": {
+          "description": "Possible values are:\n  - Prepaid\n  - Postpaid",
+          "type": "string"
+        },
+        "customerName": {
+          "description": "Name of the subscriber",
+          "example": "Osman Fındık",
+          "type": "string"
+        },
+        "imsi": {
+          "description": "IMSI of the subscriber",
+          "example": 420032332534811,
+          "type": "string"
+        }
+      }
+    },
+    "Error": {
+      "type": "object",
+      "description": "Possible errors:\n  - 0 - Success\n  - 1001 - Mandatory parameter msisdn is missing\n  - 1002 - Parameter msisdn is not valid.\n  - 1003 - Subscriber does not exist\n  - 9000 - System failure. Details: <Error detail>",
+      "required": [
+        "errorCode",
+        "message"
+      ],
+      "properties": {
+        "errorCode": {
+          "type": "integer"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
